@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Manager</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  background:#f4f6f9;
+}
+
+/* Navbar */
+nav{
+  background:#1e293b;
+  color:white;
+  padding:15px 40px;
+  display:flex;
+  justify-content:space-between;
+}
+
+button{
+  cursor:pointer;
+}
+
+/* Layout */
+.container{
+  display:flex;
+  padding:20px;
+}
+
+/* Sidebar */
+.sidebar{
+  width:250px;
+  background:#111827;
+  color:white;
+  padding:20px;
+  border-radius:10px;
+}
+
+.sidebar button{
+  width:100%;
+  padding:10px;
+  background:#22c55e;
+  border:none;
+  color:white;
+  margin-top:10px;
+}
+
+/* Main */
+.main{
+  flex:1;
+  margin-left:20px;
+}
+
+/* Cards */
+.card{
+  background:white;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:10px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Task */
+.task{
+  padding:10px;
+  margin-top:10px;
+  background:#f1f5f9;
+  border-radius:8px;
+  display:flex;
+  justify-content:space-between;
+}
+
+.progress{
+  height:10px;
+  background:#ddd;
+  border-radius:5px;
+  margin-top:10px;
+}
+
+.progress-bar{
+  height:10px;
+  background:#22c55e;
+  border-radius:5px;
+}
+
+/* Inputs */
+input{
+  padding:8px;
+  margin:5px 0;
+  width:100%;
+}
+
+.add-btn{
+  background:#3b82f6;
+  color:white;
+  border:none;
+  padding:8px;
+}
+
+/* Responsive */
+@media(max-width:768px){
+  .container{
+    flex-direction:column;
+  }
+  .sidebar{
+    width:100%;
+    margin-bottom:20px;
+  }
+}
+</style>
+
+</head>
+
+<body>
+
+<nav>
+  <h2>Project Manager</h2>
+  <p>User Dashboard</p>
+</nav>
+
+<div class="container">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h3>Create Project</h3>
+    <input type="text" id="projectName" placeholder="Project name">
+    <button onclick="addProject()">Add Project</button>
+  </div>
+
+  <!-- Main -->
+  <div class="main" id="projectContainer"></div>
+
+</div>
+
+<script>
+let projects = [];
+
+function addProject(){
+  const name = document.getElementById("projectName").value;
+  if(name === "") return;
+
+  projects.push({
+    name,
+    tasks:[]
+  });
+
+  document.getElementById("projectName").value="";
+  render();
+}
+
+function addTask(index){
+  const taskName = prompt("Enter task name:");
+  const deadline = prompt("Enter deadline:");
+
+  if(!taskName) return;
+
+  projects[index].tasks.push({
+    name: taskName,
+    deadline,
+    done:false
+  });
+
+  render();
+}
+
+function toggleTask(pIndex, tIndex){
+  projects[pIndex].tasks[tIndex].done = !projects[pIndex].tasks[tIndex].done;
+  render();
+}
+
+function render(){
+  const container = document.getElementById("projectContainer");
+  container.innerHTML="";
+
+  projects.forEach((project, pIndex)=>{
+    let completed = project.tasks.filter(t=>t.done).length;
+    let total = project.tasks.length;
+    let percent = total ? (completed/total)*100 : 0;
+
+    let html = `
+      <div class="card">
+        <h3>${project.name}</h3>
+        <button onclick="addTask(${pIndex})">Add Task</button>
+
+        <div class="progress">
+          <div class="progress-bar" style="width:${percent}%"></div>
+        </div>
+
+        ${project.tasks.map((task, tIndex)=>`
+          <div class="task">
+            <span onclick="toggleTask(${pIndex}, ${tIndex})"
+              style="text-decoration:${task.done?'line-through':'none'}">
+              ${task.name} (${task.deadline})
+            </span>
+          </div>
+        `).join("")}
+      </div>
+    `;
+
+    container.innerHTML += html;
+  });
+}
+</script>
+
+</body>
+</html>
